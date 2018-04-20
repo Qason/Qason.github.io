@@ -1,0 +1,51 @@
+[31mCould not find proper version of jekyll (3.1.6) in any of the sources[0m
+[33mRun `bundle install` to install missing gems.[0m
+Configuration file: /data/qason_blog/skinny-bones-jekyll/_config.yml
+            Source: /data/qason_blog/skinny-bones-jekyll
+       Destination: /data/qason_blog/skinny-bones-jekyll/_site
+ Incremental build: disabled. Enable with --incremental
+      Generating... 
+                    done in 1.582 seconds.
+ Auto-regeneration: enabled for '/data/qason_blog/skinny-bones-jekyll'
+Configuration file: /data/qason_blog/skinny-bones-jekyll/_config.yml
+    Server address: http://127.0.0.1:4000/
+  Server running... press ctrl-c to stop.
+[2018-04-20 17:54:32] ERROR `/jekyll/update/2018/04/19/welcome-to-jekyll.html' not found.
+      Regenerating: 1 file(s) changed at 2018-04-20 18:02:33 ...done in 0.682268062 seconds.
+Configuration file: /data/qason_blog/skinny-bones-jekyll/_config.yml
+            Source: /data/qason_blog/skinny-bones-jekyll
+       Destination: /data/qason_blog/skinny-bones-jekyll/_site
+ Incremental build: disabled. Enable with --incremental
+      Generating... 
+                    done in 0.702 seconds.
+ Auto-regeneration: enabled for '/data/qason_blog/skinny-bones-jekyll'
+Configuration file: /data/qason_blog/skinny-bones-jekyll/_config.yml
+    Server address: http://127.0.0.1:4000/
+  Server running... press ctrl-c to stop.
+      Regenerating: 1 file(s) changed at 2018-04-20 18:27:22 ...done in 0.83377181 seconds.
+      Regenerating: 3 file(s) changed at 2018-04-20 18:27:23 ...done in 0.727327118 seconds.
+      Regenerating: 1 file(s) changed at 2018-04-20 18:27:24 ...done in 0.706432602 seconds.
+      Regenerating: 1 file(s) changed at 2018-04-20 18:28:27 ...done in 0.759221636 seconds.
+      Regenerating: 1 file(s) changed at 2018-04-20 18:28:30 ...done in 0.77886586 seconds.
+      Regenerating: 1 file(s) changed at 2018-04-20 18:29:13 ...done in 0.830914173 seconds.
+Configuration file: /data/qason_blog/skinny-bones-jekyll/_config.yml
+            Source: /data/qason_blog/skinny-bones-jekyll
+       Destination: /data/qason_blog/skinny-bones-jekyll/_site
+ Incremental build: disabled. Enable with --incremental
+      Generating... 
+                    done in 0.799 seconds.
+ Auto-regeneration: enabled for '/data/qason_blog/skinny-bones-jekyll'
+Configuration file: /data/qason_blog/skinny-bones-jekyll/_config.yml
+    Server address: http://127.0.0.1:4000/
+  Server running... press ctrl-c to stop.
+[2018-04-20 19:17:59] ERROR `/linux/' not found.
+Configuration file: /data/qason_blog/skinny-bones-jekyll/_config.yml
+            Source: /data/qason_blog/skinny-bones-jekyll
+       Destination: /data/qason_blog/skinny-bones-jekyll/_site
+ Incremental build: disabled. Enable with --incremental
+      Generating... 
+                    done in 0.868 seconds.
+ Auto-regeneration: enabled for '/data/qason_blog/skinny-bones-jekyll'
+Configuration file: /data/qason_blog/skinny-bones-jekyll/_config.yml
+    Server address: http://127.0.0.1:4000/
+  Server running... press ctrl-c to stop.
