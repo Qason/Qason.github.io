@@ -1,240 +1,424 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom"><generator uri="http://jekyllrb.com" version="3.1.6">Jekyll</generator><link href="/atom.xml" rel="self" type="application/atom+xml" /><link href="/" rel="alternate" type="text/html" /><updated>2018-04-27T19:43:59+08:00</updated><id>/</id><title>Qason Blog</title><subtitle>Linux  devops</subtitle><entry><title>Facebook OnlineSchemaChange 再开源和改进介绍</title><link href="/mysql/open_source_osc/" rel="alternate" type="text/html" title="Facebook OnlineSchemaChange 再开源和改进介绍" /><published>2017-05-05T00:00:00+08:00</published><updated>2017-05-05T00:00:00+08:00</updated><id>/mysql/open_source_osc</id><content type="html" xml:base="/mysql/open_source_osc/">&lt;ul id=&quot;markdown-toc&quot;&gt;
-  &lt;li&gt;&lt;a href=&quot;#section-1&quot; id=&quot;markdown-toc-section-1&quot;&gt;设计初衷和困境&lt;/a&gt;&lt;/li&gt;
-  &lt;li&gt;&lt;a href=&quot;#section-2&quot; id=&quot;markdown-toc-section-2&quot;&gt;变化和改进&lt;/a&gt;&lt;/li&gt;
-  &lt;li&gt;&lt;a href=&quot;#section-6&quot; id=&quot;markdown-toc-section-6&quot;&gt;项目的展望&lt;/a&gt;&lt;/li&gt;
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom"><generator uri="http://jekyllrb.com" version="3.1.6">Jekyll</generator><link href="/atom.xml" rel="self" type="application/atom+xml" /><link href="/" rel="alternate" type="text/html" /><updated>2018-04-27T21:53:01+08:00</updated><id>/</id><title>Qason Blog</title><subtitle>Linux  devops</subtitle><entry><title>通过一个云平台故障案例了解数据包在iptables中的流向</title><link href="/linux/a-example-understand-iptables/" rel="alternate" type="text/html" title="通过一个云平台故障案例了解数据包在iptables中的流向" /><published>2017-03-22T00:00:00+08:00</published><updated>2017-03-22T00:00:00+08:00</updated><id>/linux/a-example-understand-iptables</id><content type="html" xml:base="/linux/a-example-understand-iptables/">&lt;ul id=&quot;markdown-toc&quot;&gt;
+  &lt;li&gt;&lt;a href=&quot;#section&quot; id=&quot;markdown-toc-section&quot;&gt;1.故障现象：&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;#section-1&quot; id=&quot;markdown-toc-section-1&quot;&gt;2.故障分析&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;#iptables45&quot; id=&quot;markdown-toc-iptables45&quot;&gt;2.1iptables4表5链的知识普及&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;#iptablestcpdump&quot; id=&quot;markdown-toc-iptablestcpdump&quot;&gt;2.2测试使用到的iptables命令和tcpdump知识&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;#sdn&quot; id=&quot;markdown-toc-sdn&quot;&gt;2.3SDN网络架构&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;#iptablestcpdump-1&quot; id=&quot;markdown-toc-iptablestcpdump-1&quot;&gt;2.4数据包流向分析(通过iptables和tcpdump)&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;#vr&quot; id=&quot;markdown-toc-vr&quot;&gt;2.4.1分析数据包在1级VR中的走向&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;#vr-1&quot; id=&quot;markdown-toc-vr-1&quot;&gt;2.4.2分析数据包在2级VR中的走向&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;#ssh-61146164120-10174--101169-22&quot; id=&quot;markdown-toc-ssh-61146164120-10174--101169-22&quot;&gt;2.4.3分析ssh 61.146.164.120 10174 如何转发到内部 10.1.1.69 22&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;#ipiptables&quot; id=&quot;markdown-toc-ipiptables&quot;&gt;2.5分析判定绑定公网IP的主要iptables规则&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;#section-2&quot; id=&quot;markdown-toc-section-2&quot;&gt;6分析如何解决上面的故障&lt;/a&gt;&lt;/li&gt;
+  &lt;li&gt;&lt;a href=&quot;#section-3&quot; id=&quot;markdown-toc-section-3&quot;&gt;参考&lt;/a&gt;&lt;/li&gt;
 &lt;/ul&gt;
 
 &lt;blockquote&gt;
-  &lt;p&gt;本文会简要介绍，OnlineSchemaChange在经历从PHP到Python重写后的改进和变化&lt;/p&gt;
+  &lt;p&gt;以下案例是基于一个cloudstack虚拟化云平台为例子，阅读者无须有相关知识背景，只需要记住这个概念；动手分一分，抓包析一析。一起来了解下数据包在iptables中是如何流淌的吧。&lt;/p&gt;
 &lt;/blockquote&gt;
 
-&lt;blockquote&gt;
-  &lt;p&gt;文章欢迎转载，但转载时请保留本段文字，并置于文章的顶部
-作者：卢钧轶(cenalulu)
-本文原文地址：&lt;a href=&quot;http://cenalulu.github.io/mysql/open_source_osc/&quot;&gt;http://cenalulu.github.io/mysql/open_source_osc/&lt;/a&gt;&lt;/p&gt;
-&lt;/blockquote&gt;
+&lt;h2 id=&quot;section&quot;&gt;1.故障现象：&lt;/h2&gt;
 
-&lt;h3 id=&quot;section&quot;&gt;前言&lt;/h3&gt;
+&lt;p&gt;云虚拟机情况简单描述：
+- 云平台一般会提供一个虚拟机ssh 登录方式为： ssh  公网IP:大端口
+- 大客户会有一个私网网段和一个VR(虚拟路由器)&lt;/p&gt;
 
-&lt;p&gt;Facebook早在2009年就开源了OnlineSchemaChange.php.  该工具主要设计初衷是用于补充当时MySQL对于在线表结构变更支持的空白，尽可能的减少表结构变更时对业务的影响。而在过去的几个月中这个工具经历了从PHP到Python重写，以及功能的新增和性能的改进。今天，重写后的OnlineSchemaChange正式宣布开源，可通过此链接访问：&lt;a href=&quot;https://github.com/facebookincubator/OnlineSchemaChange&quot;&gt;https://github.com/facebookincubator/OnlineSchemaChange&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;故障现象：客户通过客服保障说：无法通过ssh方式登录。
+&amp;gt;ssh 61.146.164.120 10174 转发到内部 10.1.1.69 22&lt;/p&gt;
 
-&lt;h2 id=&quot;section-1&quot;&gt;设计初衷和困境&lt;/h2&gt;
+&lt;p&gt;作为运维人员：我做了以下的故障检测
+1. 尝试通过电信联通移动等不同运营商进行ssh登录，果然无法登录
+2. 询问客户该机器提供的服务是否正常(正常)
+3. 让客户使用同网段(私网)的其他虚拟机 ssh登录:结果正常
+4. 询问客户做了那些变更操作(关键点)&lt;/p&gt;
 
-&lt;p&gt;最早，OSC是为了解决MySQL在进行表结构变更时锁表所带来的业务影响。同时，它也满足一部分DDL无法提供的功能。例如：&lt;code class=&quot;highlighter-rouge&quot;&gt;ALTER TABLE IGNORE ... ENGINE=INNODB&lt;/code&gt;。
-然而在PHP的使用过程中我们发现设计上缺陷和程序编写方式的问题导致这个工具的可扩展性较差，并且无法更好的进行功能测试。随着时间的积累，往这个工具增加新功能的难度越来越高，甚至修复bug都成了一个不可能完成的任务。同时功能测试的缺失也成为了吸纳社区贡献的一个重大阻碍，致使整个项目的活跃度下降。
-因此在去年我们决定重写这个工具，同时加入更多我们向往已久的功能。&lt;/p&gt;
+&lt;p&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;	客户绑定了一个公网IP 10.1.1.69---61.146.164.82,并且只是放行了tcp端口300--65535&lt;/code&gt;&lt;/p&gt;
 
-&lt;p&gt;&lt;img src=&quot;/images/mysql/osc/osc.png&quot; alt=&quot;osc_archi&quot; /&gt;&lt;/p&gt;
+&lt;h2 id=&quot;section-1&quot;&gt;2.故障分析&lt;/h2&gt;
 
-&lt;h2 id=&quot;section-2&quot;&gt;变化和改进&lt;/h2&gt;
+&lt;p&gt;云平台现在使用的是SDN(软件定义网络)，简单的说，就是拿linux服务器作为这个路由网关设备，然后通过iptables规则，来做数据包的转发。&lt;/p&gt;
 
-&lt;h3 id=&quot;section-3&quot;&gt;使用便捷&lt;/h3&gt;
+&lt;p&gt;故障分析，无非就是分析数据包的走向，结合iptable数据包转发顺序和路由表这两块内容来分析，最好要注意这个转发的接口问题。&lt;/p&gt;
 
-&lt;p&gt;之前开源的OSC更多的像是一个概念和一段代码，本身无法直接使用。用户需要自己把核心逻辑封装成一个可执行的脚本。这个大大增加的OSC的可用度也从而导致了社区的接纳度不高。新版本的OSC.py是一个命令行可执行的脚本，很大程度上提高了易用性成为一个下载即可使用的工具。
-同时，OSC.py的核心逻辑也独立成为Python Module存在。如果你的运维整体架构是基于Python搭建的那么新的OSC.py将可以很容易的融合到你的工具集当中。&lt;/p&gt;
+&lt;p&gt;动手分一分，抓包析一析。回头一看，如此简单粗暴。&lt;/p&gt;
 
-&lt;h3 id=&quot;section-4&quot;&gt;可测试性&lt;/h3&gt;
+&lt;h2 id=&quot;iptables45&quot;&gt;2.1iptables4表5链的知识普及&lt;/h2&gt;
 
-&lt;p&gt;受到&lt;code class=&quot;highlighter-rouge&quot;&gt;mysql-test-run&lt;/code&gt;的启发，新的OSC实现了一个类似的测试案例设计。及时是一个不懂Python的用户也可以非常容易的写出一个基于JSON+SQL的测试案例，提交一个issue来描述自己遇到的bug。同时这也使得吸纳社区patch的可靠性大幅提高。
-同时受益于Python语言本身，整个工具也实现很高的单元测试覆盖度，可靠性有了很好的保障。&lt;/p&gt;
+&lt;p&gt;iptables 4表五链的数据包流向顺序，这里借助鸟哥的图，多谢鸟哥。
+&lt;img src=&quot;/images/linux/iptables/four_table_five_chain.jpg&quot; alt=&quot;four_table_five_chain&quot; /&gt;&lt;/p&gt;
 
-&lt;h3 id=&quot;section-5&quot;&gt;可靠性&lt;/h3&gt;
+&lt;p&gt;从上图可以很清晰的看到数据包在规则链中的流动路径:
+&lt;code class=&quot;highlighter-rouge&quot;&gt;数据包先经过mangle表的PREROUTING链,然后进入nat表的PREROUTING链,然后路由进行判定:
+1. 如果目标是本机则进入mangle表的INPUT链,在进入filter表的INPUT链到达本机（应用层接受数据), 最后数据经由mangle表的OUTPUT链,nat表OUTPUT链,filter表OUTPUT链
+2. 如果目标不是本机且开启了forward则数据包进入mangle表FORWARD链,然后到filter表FORWARD链
+最终都到达mangle表POSTROUTING链,经过nat表POSTROUTING链传出&lt;/code&gt;&lt;/p&gt;
 
-&lt;p&gt;和目前所有开源的在线表结构变更工具不同，OSC.py实现了一致性检验的功能。在Facebook数据一致性高于一切。一致性的检验可以让我们非常放心在任何时刻进行任何表结构变更而不用担心因工具bug而造成的数据丢失或者损毁。同时，一致性校验也是一种对社区用户负责的态度。MySQL的运行环境和配置参数千变万化，而Facebook的线上环境所能涵盖的只是一小部分。能在FB正常运行并不意味着这个工具就可以对bug免疫。一致性校验的存在可以让OSC.py优雅的避免各种环境变化所可能带来的潜在bug对数据的损坏。&lt;/p&gt;
-
-&lt;p&gt;要详细了解更多OSC.py带来的新特性可以查看这个&lt;a href=&quot;https://github.com/facebookincubator/OnlineSchemaChange/wiki/Special-Things-About-OSC&quot;&gt;wiki page&lt;/a&gt;&lt;/p&gt;
-
-&lt;h2 id=&quot;section-6&quot;&gt;项目的展望&lt;/h2&gt;
-
-&lt;p&gt;随着&lt;code class=&quot;highlighter-rouge&quot;&gt;Row Based Replication&lt;/code&gt;的普及和在Facebook内部的全面部署，我们将会增加基于RBR binlog增量记录的功能，从而完全避免trigger模式带来的性能损耗。同时，我们也将会将原生在线表结构变更的支持增加到智能模式中，在实现一个工具满足所有表结构变更的需求的同时达到最小的不可用时间。&lt;/p&gt;
-
-&lt;p&gt;最后我们也非常希望和开源社区一起对OSC进行改进和开发，使之能成为一个更为可靠高效的DBA工具。&lt;/p&gt;
-
-&lt;p&gt;最后附上github的repo地址：&lt;a href=&quot;https://github.com/facebookincubator/OnlineSchemaChange&quot;&gt;https://github.com/facebookincubator/OnlineSchemaChange&lt;/a&gt;&lt;/p&gt;</content><summary></summary><media:thumbnail xmlns:media="http://search.yahoo.com/mrss/" url="{&quot;teaser&quot;=&gt;&quot;/teaser/osc.jpg&quot;}" /></entry><entry><title>Jekyll&amp;amp;Github Pages博客模板挑选和配置</title><link href="/mysql/choose-a-template-for-your-blog/" rel="alternate" type="text/html" title="Jekyll&amp;Github Pages博客模板挑选和配置" /><published>2015-01-04T00:00:00+08:00</published><updated>2015-01-04T00:00:00+08:00</updated><id>/mysql/choose-a-template-for-your-blog</id><content type="html" xml:base="/mysql/choose-a-template-for-your-blog/">&lt;ul id=&quot;markdown-toc&quot;&gt;
-  &lt;li&gt;&lt;a href=&quot;#section&quot; id=&quot;markdown-toc-section&quot;&gt;模板挑选&lt;/a&gt;&lt;/li&gt;
-  &lt;li&gt;&lt;a href=&quot;#section-1&quot; id=&quot;markdown-toc-section-1&quot;&gt;模板安装&lt;/a&gt;&lt;/li&gt;
-  &lt;li&gt;&lt;a href=&quot;#section-2&quot; id=&quot;markdown-toc-section-2&quot;&gt;模板基本配置&lt;/a&gt;&lt;/li&gt;
-  &lt;li&gt;&lt;a href=&quot;#section-3&quot; id=&quot;markdown-toc-section-3&quot;&gt;模板页头导航配置&lt;/a&gt;&lt;/li&gt;
-  &lt;li&gt;&lt;a href=&quot;#section-4&quot; id=&quot;markdown-toc-section-4&quot;&gt;其他配置&lt;/a&gt;&lt;/li&gt;
-&lt;/ul&gt;
-
-&lt;blockquote&gt;
-  &lt;p&gt;当按照上一篇&lt;a href=&quot;/jekyll/how-to-build-a-blog-using-jekyll-markdown&quot;&gt;jekyll入门教程&lt;/a&gt;步骤操作后，你就拥有了一个属于自己的免费Blog。但是界面非常的朴素甚至有时无法满足最基本的写作需求。因此本文将会简单的介绍jekyll模板的挑选和配置过程&lt;/p&gt;
-&lt;/blockquote&gt;
-
-&lt;h2 id=&quot;section&quot;&gt;模板挑选&lt;/h2&gt;
-
-&lt;p&gt;jekyll的模板一般会有以下几个集中挑选的地方：&lt;/p&gt;
+&lt;p&gt;根据上图的数据包的流动情况现在我们可以很容易的添加规则到对应的链路来满足我们的需求,下面是我们常用的一些场景:&lt;/p&gt;
 
 &lt;ul&gt;
-  &lt;li&gt;&lt;a href=&quot;http://jekyllthemes.org/&quot;&gt;jekyllthemes.org&lt;/a&gt;&lt;/li&gt;
-  &lt;li&gt;&lt;a href=&quot;https://www.jekyllthemes.net/&quot;&gt;jekythemes.net&lt;/a&gt;&lt;/li&gt;
-  &lt;li&gt;&lt;a href=&quot;https://mademistakes.com/work/jekyll-themes/&quot;&gt;mademistakes&lt;/a&gt; （本博客就是从这位大神的多个jekyll模板中挑选的）&lt;/li&gt;
+  &lt;li&gt;修改数据包的来源ip地址及端口可以在nat表的PREROUTING链添加规则
+- 过滤未授权及非法ip来源及端口的数据包到达本机可以在filter表的INPUT链添加规则&lt;/li&gt;
+  &lt;li&gt;过滤未授权及非法ip来源及端口的数据包forward可以在filter表的FORWARD链添加规则&lt;/li&gt;
+  &lt;li&gt;修改出口数据包的ip地址及端口可以在nat表的POSTROUTING表添加规则(充当代理服务器)&lt;/li&gt;
 &lt;/ul&gt;
 
-&lt;p&gt;对于模板的挑选原则，博主觉得有以下几个参考点：&lt;/p&gt;
+&lt;p&gt;上面的图示很复杂喔！不过基本上你依旧可以看出来，我们的 iptables 可以控制三种封包的流向：&lt;/p&gt;
 
 &lt;ul&gt;
-  &lt;li&gt;github支持的jekyll插件有限，模板是否需要额外插件支持&lt;/li&gt;
-  &lt;li&gt;是否支持disqus（Blog的评论区是一个基础功能）&lt;/li&gt;
-  &lt;li&gt;是否支持Google AdSense（写Blog的同时能给自己带来一些额外收入当然也是不错的！2333）&lt;/li&gt;
-  &lt;li&gt;配置是否简单（大部分配置是否能在YAML部分完成）&lt;/li&gt;
-  &lt;li&gt;bug修复和新功能开发的速度是否稳定&lt;/li&gt;
+  &lt;li&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;封包进入 Linux 主机使用资源 (路径 A)&lt;/code&gt;： 在路由判断后确定是向 Linux 主机要求数据的封包，主要就会透过 filter 的 INPUT 链来进行控管；&lt;/li&gt;
+  &lt;li&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;封包经由 Linux 主机的转递，没有使用主机资源，而是向后端主机流动 (路径 B)&lt;/code&gt;： 在路由判断之前进行封包表头的修订作业后，发现到封包主要是要透过防火墙而去后端，此时封包就会透过路径 B 来跑动。 也就是说，该封包的目标并非我们的 Linux 本机。主要经过的链是 filter 的 FORWARD 以及 nat 的 POSTROUTING, PREROUTING。&lt;/li&gt;
+  &lt;li&gt;&lt;code class=&quot;highlighter-rouge&quot;&gt;封包由 Linux 本机发送出去 (路径 C)&lt;/code&gt;： 例如响应客户端的要求，或者是 Linux 本机主动送出的封包，都是透过路径 C 来跑的。先是透过路由判断， 决定了输出的路径后，再透过 filter 的 OUTPUT 链来传送的！当然，最终还是会经过 nat 的 POSTROUTING 链。&lt;/li&gt;
 &lt;/ul&gt;
 
-&lt;p&gt;按照以上几个原则进行考评后，博主选择了&lt;a href=&quot;http://mmistakes.github.io/skinny-bones-jekyll/&quot;&gt;Skinny-Bones&lt;/a&gt;。下文也将围绕如何安装配置Skinny-Bones展开。&lt;/p&gt;
+&lt;p&gt;由于 mangle 这个表格很少被使用，如果将上图 的 mangle 拿掉的话，那就容易看的多了：
+&lt;img src=&quot;/images/linux/iptables/three_table_five_chain.jpg&quot; alt=&quot;three_table_five_chain&quot; /&gt;&lt;/p&gt;
 
-&lt;h2 id=&quot;section-1&quot;&gt;模板安装&lt;/h2&gt;
+&lt;p&gt;一般来说我们接触并使用最多的是
+1. filter表的INPUT链
+2. nat表的PREROUTING,POSTROUTING链&lt;/p&gt;
 
-&lt;p&gt;安装过程比较简单，通过&lt;code class=&quot;highlighter-rouge&quot;&gt;git clone&lt;/code&gt;将模板代码下载到本地目录中。运行&lt;code class=&quot;highlighter-rouge&quot;&gt;bundle install&lt;/code&gt;进行依赖包安装（原理类似于python的virtualenv）。然后用&lt;code class=&quot;highlighter-rouge&quot;&gt;bundle exec jekyll serve&lt;/code&gt;就可以查看模板效果了。以下是安装的过程和输出&lt;/p&gt;
+&lt;h2 id=&quot;iptablestcpdump&quot;&gt;2.2测试使用到的iptables命令和tcpdump知识&lt;/h2&gt;
 
-&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-bash&quot; data-lang=&quot;bash&quot;&gt;michelles-mbp:Blog michellezhou&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;sudo gem install bundler
-Fetching: bundler-1.7.11.gem &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;100%&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
-Successfully installed bundler-1.7.11
-Parsing documentation &lt;span class=&quot;k&quot;&gt;for &lt;/span&gt;bundler-1.7.11
-Installing ri documentation &lt;span class=&quot;k&quot;&gt;for &lt;/span&gt;bundler-1.7.11
-1 gem installed
-michelles-mbp:skinny-bones-jekyll-master michellezhou&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;bundle install
-Fetching gem metadata from https://rubygems.org/........
-Using blankslate 2.1.2.4
-Installing sass 3.4.7
-Installing thor 0.19.1
-Installing bourbon 4.0.2
-Using hitimes 1.2.2
-Using timers 4.0.1
-Using celluloid 0.16.0
-Using fast-stemmer 1.0.2
-Installing classifier-reborn 2.0.2
-Using coffee-script-source 1.8.0
-Using execjs 2.2.2
-Using coffee-script 2.3.0
-Using colorator 0.1
-Using ffi 1.9.6
-Using jekyll-coffeescript 1.0.1
-Using jekyll-gist 1.1.0
-Using jekyll-paginate 1.1.0
-Installing jekyll-sass-converter 1.2.1
-Using rb-fsevent 0.9.4
-Using rb-inotify 0.9.5
-Installing listen 2.7.11
-Installing jekyll-watch 1.1.2
-Using kramdown 1.5.0
-Using liquid 2.6.1
-Installing mercenary 0.3.4
-Using posix-spawn 0.3.9
-Using yajl-ruby 1.1.0
-Using pygments.rb 0.6.0
-Installing redcarpet 3.2.0
-Using safe_yaml 1.0.4
-Using parslet 1.5.0
-Using toml 0.1.2
-Installing jekyll 2.4.0
-Installing jekyll-sitemap 0.6.1
-Installing neat 1.7.0
-Installing octopress-hooks 2.2.1
-Installing octopress-escape-code 1.0.2
-Installing octopress-docs 0.0.9
-Installing octopress-deploy 1.0.0
-Installing titlecase 0.1.1
-Installing octopress 3.0.0.rc.15
-Using bundler 1.7.11
-Your bundle is &lt;span class=&quot;nb&quot;&gt;complete&lt;/span&gt;!
-Use &lt;span class=&quot;sb&quot;&gt;`&lt;/span&gt;bundle show &lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;gemname]&lt;span class=&quot;sb&quot;&gt;`&lt;/span&gt; to see where a bundled gem is installed.&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-bash&quot; data-lang=&quot;bash&quot;&gt;iptables -t nat -L -n --line-numbers -v -x
+-v：显示接口名字，包数量和包总量 人性化显示
+-x：详细数据包信息，K显示
+-L: 列出规则
+-n：不做域名解析
+--line-numbers：行号&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
 
-&lt;p&gt;这里需要特别指出的是，如果简单的通过&lt;code class=&quot;highlighter-rouge&quot;&gt;jekyll serve&lt;/code&gt;命令启动jekyll的话会有如下的报错。如前文所说模板是通过bundle安装独立的依赖包环境的，因此一定需要通过&lt;code class=&quot;highlighter-rouge&quot;&gt;bundle exec jekyll serve&lt;/code&gt;才能够使用到本目录下的依赖环境正常运行&lt;/p&gt;
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-bash&quot; data-lang=&quot;bash&quot;&gt;tcpdump  -nn -i dev  dst port
+-nn :不做ip：port的域名解析
+-i dev:抓取指定的接口
+dst port：抓取目标端口为
+常用的组合为：
+dst host
+src host
+src port
+dst port
+可以使用 and 和or 组合&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
 
-&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-bash&quot; data-lang=&quot;bash&quot;&gt;michelles-mbp:skinny-bones-jekyll-master michellezhou&lt;span class=&quot;nv&quot;&gt;$ &lt;/span&gt;jekyll server
-WARN: Unresolved specs during Gem::Specification.reset:
-      redcarpet &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;~&amp;gt; 3.1&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
-      jekyll-watch &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;~&amp;gt; 1.1&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
-      classifier-reborn &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;~&amp;gt; 2.0&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
-WARN: Clearing out unresolved specs.
-Please report a bug &lt;span class=&quot;k&quot;&gt;if &lt;/span&gt;this causes problems.
-/Library/Ruby/Gems/2.0.0/gems/jekyll-2.5.3/bin/jekyll:21:in block &lt;span class=&quot;k&quot;&gt;in&lt;/span&gt; &amp;lt;top &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;required&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;&amp;gt;&lt;span class=&quot;s1&quot;&gt;&#39;: cannot load such file -- jekyll/version (LoadError)
-	from /Library/Ruby/Gems/2.0.0/gems/mercenary-0.3.5/lib/mercenary.rb:18:in program&#39;&lt;/span&gt;
-	from /Library/Ruby/Gems/2.0.0/gems/jekyll-2.5.3/bin/jekyll:20:in &amp;lt;top &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;required&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;&amp;gt;&lt;span class=&quot;s1&quot;&gt;&#39;
-	from /usr/bin/jekyll:23:in load&#39;&lt;/span&gt;
-	from /usr/bin/jekyll:23:in &amp;lt;main&amp;gt;&lt;span class=&quot;s1&quot;&gt;&#39;
-michelles-mbp:skinny-bones-jekyll-master michellezhou$ bundle exec jekyll server
-Configuration file: /Users/michellezhou/Blog/skinny-bones-jekyll-master/_config.yml
-            Source: /Users/michellezhou/Blog/skinny-bones-jekyll-master
-       Destination: /Users/michellezhou/Blog/skinny-bones-jekyll-master/_site
-      Generating...
-                    done.
- Auto-regeneration: enabled for &#39;&lt;/span&gt;/Users/michellezhou/Blog/skinny-bones-jekyll-master&lt;span class=&quot;s1&quot;&gt;&#39;
-Configuration file: /Users/michellezhou/Blog/skinny-bones-jekyll-master/_config.yml
-    Server address: http://0.0.0.0:4000/
-  Server running... press ctrl-c to stop.&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+&lt;p&gt;特别注意：tcpdump默认抓取的eth0接口的数据包，如果是其他接口的数据包，&lt;code class=&quot;highlighter-rouge&quot;&gt;一定要手动指定接口&lt;/code&gt;。&lt;/p&gt;
 
-&lt;h2 id=&quot;section-2&quot;&gt;模板基本配置&lt;/h2&gt;
+&lt;h2 id=&quot;sdn&quot;&gt;2.3SDN网络架构&lt;/h2&gt;
+&lt;p&gt;简单文字描述
+外网—&amp;gt;一级VR—&amp;gt;二级VR–&amp;gt;虚拟机&lt;/p&gt;
 
-&lt;p&gt;然后就是模板的配置，配置过程相对简单。比较费时的地方就是为自己的博客挑选头像和文章简介图片（teaser）。博主这里头像用PhotoEditor将照片调整到模板推荐的&lt;code class=&quot;highlighter-rouge&quot;&gt;120x120&lt;/code&gt;大小，文章简介直接在google上搜&lt;code class=&quot;highlighter-rouge&quot;&gt;400x250&lt;/code&gt;然后将图片放置到根目录下的&lt;code class=&quot;highlighter-rouge&quot;&gt;/images/&lt;/code&gt;并进行配置即可。这里需要指出的是，如果&lt;em&gt;不是&lt;/em&gt;Github Project Page，那么这里的&lt;code class=&quot;highlighter-rouge&quot;&gt;url&lt;/code&gt;配置需要留空。如果将&lt;code class=&quot;highlighter-rouge&quot;&gt;url&lt;/code&gt;配置成自己Blog在github的地址会给本地调试带来困难。例如还未上传到github上的image将在本地调试的时候无法访问。以下是本博客的配置文件：&lt;/p&gt;
+&lt;p&gt;这里面使用到了共二层转发，因此中间有一个过渡IP
+图解：
+&lt;img src=&quot;/images/linux/iptables/sdn-network.jpg&quot; alt=&quot;sdn-network&quot; /&gt;&lt;/p&gt;
 
-&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-bash&quot; data-lang=&quot;bash&quot;&gt;title: &lt;span class=&quot;s2&quot;&gt;&quot;cenalulu&#39;s Tech Blog&quot;&lt;/span&gt;
-description: &lt;span class=&quot;s2&quot;&gt;&quot;Collection of everythings I want to record down especially for tech&quot;&lt;/span&gt;
-logo: logo.jpg &lt;span class=&quot;c&quot;&gt;# 120x120 px default image used for Twitter summary card&lt;/span&gt;
-teaser: teaser.jpg# 400x250 px default teaser image used &lt;span class=&quot;k&quot;&gt;in &lt;/span&gt;image archive grid
-locale:
-url: 
+&lt;h2 id=&quot;iptablestcpdump-1&quot;&gt;2.4数据包流向分析(通过iptables和tcpdump)&lt;/h2&gt;
+&lt;p&gt;注意：这套环境仅仅没有使用raw表，所以使用mangle，filter和nat表分析。&lt;/p&gt;
 
-sass:
-    sass_dir: _sass
-    style: compressed
-permalink: /:categories/:title/
-markdown: kramdown
-highlighter: pygments
-gems:
-  - jekyll-sitemap
+&lt;p&gt;实战分析：&lt;/p&gt;
+
+&lt;p&gt;本机ip为183.62.15.118&lt;/p&gt;
+
+&lt;p&gt;目标虚拟机的公网ip和端口为 61.146.164.120 10174&lt;/p&gt;
+
+&lt;p&gt;IP 183.62.15.118. 20147&amp;gt; 61.146.164.120 10174&lt;/p&gt;
+
+&lt;p&gt;使用tcpdump抓包的目的：&lt;/p&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;验证分析iptables规则的正确性&lt;/li&gt;
+  &lt;li&gt;强化练习使用tcpdump命令&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;一举两得，何乐而不为呢？&lt;/p&gt;
+
+&lt;h2 id=&quot;vr&quot;&gt;2.4.1分析数据包在1级VR中的走向&lt;/h2&gt;
+
+&lt;p&gt;抓包分析的时候不断ssh测试&lt;/p&gt;
+
+&lt;p&gt;大概如下：&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-bash&quot; data-lang=&quot;bash&quot;&gt;&lt;span class=&quot;gp&quot;&gt;Xshell:\&amp;gt; &lt;/span&gt;ssh 61.146.164.120 10174
 
 
-owner: 
-  name: cenalulu（卢钧轶）
-  email: cenalulu@gmail.com
-  twitter: cenalulu
-  google:
-    ad-client:
-    ad-slot:
-  bio:
-  avatar: bio-photo.jpg &lt;span class=&quot;c&quot;&gt;# 160x160 px image for author byline&lt;/span&gt;
-disqus-shortname: cenalulu&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+Connecting to 61.146.164.120:10174...
+Could not connect to &lt;span class=&quot;s1&quot;&gt;&#39;61.146.164.120&#39;&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;port 10174&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;: Connection failed.
 
-&lt;p&gt;下图是基本配置后的博客效果
-&lt;img src=&quot;/images/jekyll/blog_preview.png&quot; alt=&quot;blog preview&quot; /&gt;&lt;/p&gt;
+Type &lt;span class=&quot;sb&quot;&gt;`&lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;help&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;&#39; to learn how to use Xshell prompt.&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
 
-&lt;h2 id=&quot;section-3&quot;&gt;模板页头导航配置&lt;/h2&gt;
+&lt;p&gt;查看1级VR的网络接口配置&lt;/p&gt;
 
-&lt;p&gt;只进行基本配置博客会显得比较单调。这部分介绍下页头导航栏的配置。具体配置在&lt;code class=&quot;highlighter-rouge&quot;&gt;_data/navigation.yml&lt;/code&gt;中进行。拿本博客的页头导航举例，具体语法如下：&lt;/p&gt;
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-bash&quot; data-lang=&quot;bash&quot;&gt;eth0:172.17.21.2/24 
+	172.17.21.1/24 secondary
+eth2：61.146.164.120/27&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
 
-&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-yaml&quot; data-lang=&quot;yaml&quot;&gt;&lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;title&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;Home&lt;/span&gt;
-  &lt;span class=&quot;s&quot;&gt;url&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;/&lt;/span&gt;
-  &lt;span class=&quot;s&quot;&gt;excerpt&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; 
-  &lt;span class=&quot;s&quot;&gt;image&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; 
+&lt;p&gt;抓包的规则：
+1. 进入VR之后，抓包
+2. 在数据包做了nat转换之后再抓取数据包&lt;/p&gt;
 
-&lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;title&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;MySQL&lt;/span&gt;
-  &lt;span class=&quot;s&quot;&gt;url&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;/mysql/&lt;/span&gt;
+&lt;p&gt;在一级VR抓包(连续尝试发送3个数据包)&lt;/p&gt;
 
-&lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;title&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;Linux&lt;/span&gt;
-  &lt;span class=&quot;s&quot;&gt;url&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;/linux/&lt;/span&gt;
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-bash&quot; data-lang=&quot;bash&quot;&gt;&lt;span class=&quot;gp&quot;&gt;root@InternetGateway:~# &lt;/span&gt;tcpdump -nn  -i eth2 host 183.62.15.118
+tcpdump: verbose output suppressed, use -v or -vv &lt;span class=&quot;k&quot;&gt;for &lt;/span&gt;full protocol decode
+listening on eth2, link-type EN10MB &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;Ethernet&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;, capture size 65535 bytes
+17:22:14.030955 IP 183.62.15.118.22449 &amp;gt; 61.146.164.120.10174: Flags &lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;S], seq 1921748684, win 65535, options &lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;mss 1460,nop,wscale 2,nop,nop,sackOK], length 0
+17:22:17.036260 IP 183.62.15.118.22449 &amp;gt; 61.146.164.120.10174: Flags &lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;S], seq 1921748684, win 65535, options &lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;mss 1460,nop,wscale 2,nop,nop,sackOK], length 0
+17:22:22.971443 IP 183.62.15.118.22449 &amp;gt; 61.146.164.120.10174: Flags &lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;S], seq 1921748684, win 65535, options &lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;mss 1460,nop,wscale 2,nop,nop,sackOK], length&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
 
-&lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;title&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;Python&lt;/span&gt;
-  &lt;span class=&quot;s&quot;&gt;url&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;/python/&lt;/span&gt;
+&lt;p&gt;分析数据包：单向的，而且已经在一级VR做了目标IP的nat转换，很明显，包是有来无回。&lt;/p&gt;
 
-&lt;span class=&quot;pi&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;title&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;Jekyll&lt;/span&gt;
-  &lt;span class=&quot;s&quot;&gt;url&lt;/span&gt;&lt;span class=&quot;pi&quot;&gt;:&lt;/span&gt; &lt;span class=&quot;s&quot;&gt;/jekyll/&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+&lt;p&gt;下面分析在一级VR的防火墙链条上面如何转换
+1)mangle表PREROUTING&lt;/p&gt;
 
-&lt;p&gt;当然光进行这样的配置，仅仅是做到了显示页头导航的作用。如果要使得点击每个页头标签能够跳转到对应分类的博文列表的话，还需要在根目录下建立和category名对应的文件夹，并在文件夹中放置一个&lt;code class=&quot;highlighter-rouge&quot;&gt;index.md&lt;/code&gt;的文件用作于分类导航页的渲染。还是拿本博客举例，可以看到页头上方有：mysql, python, linux, jekyll 四个分类。那么我们就需要在blog的根目录下手工创建四个文件夹&lt;code class=&quot;highlighter-rouge&quot;&gt;mysql&lt;/code&gt;,&lt;code class=&quot;highlighter-rouge&quot;&gt;python&lt;/code&gt;,&lt;code class=&quot;highlighter-rouge&quot;&gt;linux&lt;/code&gt;,&lt;code class=&quot;highlighter-rouge&quot;&gt;jekyll&lt;/code&gt;，并且在这四个文件夹中都创建一个&lt;code class=&quot;highlighter-rouge&quot;&gt;index.md&lt;/code&gt;。这个文件的内容决定了每个分类的首页如何展示。当然最简单快速的方法是把根目录下的&lt;code class=&quot;highlighter-rouge&quot;&gt;index.md&lt;/code&gt;copy过来稍作修改。同时把permalink配置删掉，再把 &lt;code class=&quot;highlighter-rouge&quot;&gt;site.posts&lt;/code&gt; 改成&lt;code class=&quot;highlighter-rouge&quot;&gt;site.categories.mysql&lt;/code&gt;这里&lt;code class=&quot;highlighter-rouge&quot;&gt;mysql&lt;/code&gt;替换为对应分类的名字即可。修改后的结果如下图：&lt;/p&gt;
+&lt;p&gt;分析：
+1. 主链上有2条自定义链匹配到了规则，跳转到自定义链，结果是全放行
+2. 回到主链，匹配到了做打标记的规则，mangle链其实主要用途就是打标记
+3. PREROUTING默认是accept
+4. 数据包放行，仅仅打了个标记&lt;/p&gt;
 
-&lt;p&gt;&lt;img src=&quot;/images/jekyll/blog_preview_with_navi.png&quot; alt=&quot;blog preview_with_navi&quot; /&gt;&lt;/p&gt;
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-bash&quot; data-lang=&quot;bash&quot;&gt;&lt;span class=&quot;gp&quot;&gt;root@InternetGateway:~# &lt;/span&gt;iptables -t mangle -L -n
+Chain PREROUTING &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;policy ACCEPT&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
+target     prot opt &lt;span class=&quot;nb&quot;&gt;source               &lt;/span&gt;destination
+VPN_61.146.164.120  all  --  0.0.0.0/0            61.146.164.120  &lt;span class=&quot;c&quot;&gt;#首先匹配到了自定义链    &lt;/span&gt;
+FIREWALL_61.146.164.120  all  --  0.0.0.0/0            61.146.164.120   
+MARK       tcp  --  0.0.0.0/0            61.146.164.120       tcp dpt:10174 MARK &lt;span class=&quot;nb&quot;&gt;set &lt;/span&gt;0x2
+CONNMARK   tcp  --  0.0.0.0/0            61.146.164.120       tcp dpt:10174 state NEW CONNMARK save
 
-&lt;h2 id=&quot;section-4&quot;&gt;其他配置&lt;/h2&gt;
 
-&lt;p&gt;本文只是介绍的最基础的模板和安装配置过程。mmistake大神出品的模板界面风格迥异，但是配置却基本相同。详细可以参见他的&lt;a href=&quot;https://mmistakes.github.io/skinny-bones-jekyll/getting-started/&quot;&gt;配置文档&lt;/a&gt;。 而其他jekyll模板本文虽然没有涉及介绍，他们的基本安装和配置思路是基本一致的，即：下载解压，覆盖原Blog目录，基本配置，上传到github。
-由于skinny bones支持的功能非常多，博客后续也还会针对各个常用功能做详细介绍。其他常用功能例如：&lt;/p&gt;
+Chain FIREWALL_61.146.164.120 &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;1 references&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
+target     prot opt &lt;span class=&quot;nb&quot;&gt;source               &lt;/span&gt;destination         
+ACCEPT     all  --  0.0.0.0/0            0.0.0.0/0            state RELATED,ESTABLISHED
+ACCEPT     all  --  0.0.0.0/0            0.0.0.0/0      
 
-&lt;ul&gt;
-  &lt;li&gt;&lt;a href=&quot;jekyll/setup-comment-for-your-blog/&quot;&gt;disqus支持&lt;/a&gt;&lt;/li&gt;
-  &lt;li&gt;&lt;a href=&quot;jekyll/jekyll-with-google-advertisement/&quot;&gt;google adsense支持&lt;/a&gt;&lt;/li&gt;
-  &lt;li&gt;social share link支持等&lt;/li&gt;
-&lt;/ul&gt;
 
-&lt;p&gt;当然读者也可以自己探索模板的具体配置方式，mmistake也提供了&lt;a href=&quot;https://mmistakes.github.io/skinny-bones-jekyll/getting-started/&quot;&gt;官方配置文档&lt;/a&gt;，同时也提供了&lt;a href=&quot;https://mmistakes.github.io/skinny-bones-jekyll/&quot;&gt;在线样例&lt;/a&gt;。如果读者觉得在线样例中的example page非常漂亮想要搬到自己Blog中来的话，也可以通过github的&lt;a href=&quot;https://github.com/mmistakes/skinny-bones-jekyll/tree/gh-pages&quot;&gt;gh-page branch&lt;/a&gt;来查看的具体markdown源文件的写法。&lt;/p&gt;</content><summary></summary></entry></feed>
+Chain VPN_61.146.164.120 &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;1 references&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
+target     prot opt &lt;span class=&quot;nb&quot;&gt;source               &lt;/span&gt;destination         
+ACCEPT     all  --  0.0.0.0/0            0.0.0.0/0            state RELATED,ESTABLISHED
+RETURN     all  --  0.0.0.0/0            0.0.0.0/0&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;p&gt;2)nat表PREROUTING
+分析：
+1. 匹配到了DNAT规则，做DNAT的转换
+2. 183.62.15.118. 20147&amp;gt; 61.146.164.120 10174 转化为了如下 183.62.15.118. 20147&amp;gt; 172.17.21.105.22
+3. 正如上面抓包所示，目标地址在nat的prerouting链上做了DNAT转换&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-bash&quot; data-lang=&quot;bash&quot;&gt;&lt;span class=&quot;gp&quot;&gt;root@InternetGateway:~# &lt;/span&gt;iptables -t nat -L -n -v
+下面列出前后两次，明显有数据包通过
+Chain PREROUTING &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;policy ACCEPT 61147 packets, 3881K bytes&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
+ pkts bytes target     prot opt &lt;span class=&quot;k&quot;&gt;in     &lt;/span&gt;out     &lt;span class=&quot;nb&quot;&gt;source               &lt;/span&gt;destination
+131  6938 DNAT       tcp  --  eth2   &lt;span class=&quot;k&quot;&gt;*&lt;/span&gt;       0.0.0.0/0            61.146.164.120       tcp dpt:10174 to:172.17.21.105:22
+  132  6990 DNAT       tcp  --  eth2   &lt;span class=&quot;k&quot;&gt;*&lt;/span&gt;       0.0.0.0/0            61.146.164.120       tcp dpt:10174 to:172.17.21.105:22&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;p&gt;目标地址变化了，目标地址是本机eth0接口相同网段，因此抓取eth0接口&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-bash&quot; data-lang=&quot;bash&quot;&gt;&lt;span class=&quot;gp&quot;&gt;root@InternetGateway:~# &lt;/span&gt;tcpdump -nn -i eth0 host 183.62.15.118
+tcpdump: verbose output suppressed, use -v or -vv &lt;span class=&quot;k&quot;&gt;for &lt;/span&gt;full protocol decode
+listening on eth0, link-type EN10MB &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;Ethernet&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;, capture size 65535 bytes
+16:45:12.260383 IP 183.62.15.118.20147 &amp;gt; 172.17.21.105.22: Flags &lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;S], seq 4195582156, win 65535, options &lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;mss 1460,nop,wscale 2,nop,nop,sackOK], length 0
+16:45:15.365081 IP 183.62.15.118.20147 &amp;gt; 172.17.21.105.22: Flags &lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;S], seq 4195582156, win 65535, options &lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;mss 1460,nop,wscale 2,nop,nop,sackOK], length 0
+16:45:21.501045 IP 183.62.15.118.20147 &amp;gt; 172.17.21.105.22: Flags &lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;S], seq 4195582156, win 65535, options &lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;mss 1460,nop,wscale 2,nop,nop,sackOK], length 0&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;p&gt;3)根据路由表转发&lt;/p&gt;
+
+&lt;p&gt;目前数据包为183.62.15.118. 20147&amp;gt; 172.17.21.105.22&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-bash&quot; data-lang=&quot;bash&quot;&gt;&lt;span class=&quot;gp&quot;&gt;root@InternetGateway:~# &lt;/span&gt;route -n
+172.17.21.0     0.0.0.0         255.255.255.0   U     0      0        0 eth0&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;p&gt;根据数据包和路由表，数据包不是发往本机的，但是和本机eth0接口IP是同个网段，因此从eth0接口发送出去(forwad方向)&lt;/p&gt;
+
+&lt;p&gt;4)mangle表forward
+空&lt;/p&gt;
+
+&lt;p&gt;5)filter表forward
+分析：
+1. 数据包事实上是从eth2接口进来的，从eth0口出去
+2. 这里的规则非常精髓，好好研究
+3. 数据包的state是属于NEW，匹配到了源地址0.0.0.0/0，目标地址为172.17.21.105:22 
+4. 可以转发出去&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-bash&quot; data-lang=&quot;bash&quot;&gt;&lt;span class=&quot;gp&quot;&gt;root@InternetGateway:~# &lt;/span&gt;iptables  -L -n -v -x
+Chain FORWARD &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;policy DROP 43 packets, 2851 bytes&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
+    pkts      bytes target     prot opt &lt;span class=&quot;k&quot;&gt;in     &lt;/span&gt;out     &lt;span class=&quot;nb&quot;&gt;source               &lt;/span&gt;destination         
+       0        0 ACCEPT     all  --  eth0   eth1    0.0.0.0/0            0.0.0.0/0            state RELATED,ESTABLISHED
+    9251   551124 ACCEPT     all  --  eth0   eth0    0.0.0.0/0            0.0.0.0/0            state NEW
+ 3656216 7131393506 ACCEPT     all  --  eth0   eth0    0.0.0.0/0            0.0.0.0/0            state RELATED,ESTABLISHED
+2575287622 1255341360189 FW_OUTBOUND  all  --  eth0   eth2    0.0.0.0/0            0.0.0.0/0           
+171494620 46905892260 ACCEPT     all  --  eth2   eth0    0.0.0.0/0            0.0.0.0/0            state RELATED,ESTABLISHED
+       0        0 ACCEPT     all  --  eth0   eth2    0.0.0.0/0            0.0.0.0/0           
+21807930 2178350475 ACCEPT     all  --  eth3   eth0    0.0.0.0/0            0.0.0.0/0            state RELATED,ESTABLISHED
+20889774 57146716281 ACCEPT     all  --  eth0   eth3    0.0.0.0/0            0.0.0.0/0           
+       0        0 ACCEPT     tcp  --  &lt;span class=&quot;k&quot;&gt;*&lt;/span&gt;      &lt;span class=&quot;k&quot;&gt;*&lt;/span&gt;       0.0.0.0/0            172.17.21.105        state RELATED,ESTABLISHED /&lt;span class=&quot;k&quot;&gt;*&lt;/span&gt; 61.146.164.120:10174:10174 &lt;span class=&quot;k&quot;&gt;*&lt;/span&gt;/
+  &lt;span class=&quot;sb&quot;&gt;`&lt;/span&gt; 21428  1209090 ACCEPT     tcp  --  &lt;span class=&quot;k&quot;&gt;*&lt;/span&gt;      &lt;span class=&quot;k&quot;&gt;*&lt;/span&gt;       0.0.0.0/0            172.17.21.105        tcp dpt:22 state NEW /&lt;span class=&quot;k&quot;&gt;*&lt;/span&gt; 61.146.164.120:10174:10174 &lt;span class=&quot;k&quot;&gt;*&lt;/span&gt;/&lt;span class=&quot;sb&quot;&gt;`&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;p&gt;这里开始我是也有点懵圈的，后面通过ssh去连接，发送的包的数量其实就是只有三个包得出结论。&lt;/p&gt;
+
+&lt;p&gt;抓包每次都是3个包&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-bash&quot; data-lang=&quot;bash&quot;&gt;&lt;span class=&quot;gp&quot;&gt;root@InternetGateway:~# &lt;/span&gt;tcpdump -nn  -i eth0 host 183.62.15.118
+tcpdump: verbose output suppressed, use -v or -vv &lt;span class=&quot;k&quot;&gt;for &lt;/span&gt;full protocol decode
+listening on eth0, link-type EN10MB &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;Ethernet&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;, capture size 65535 bytes
+19:15:47.766651 IP 183.62.15.118.25546 &amp;gt; 172.17.21.105.22: Flags &lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;S], seq 3657881821, win 65535, options &lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;mss 1460,nop,wscale 2,nop,nop,sackOK], length 0
+19:15:50.722647 IP 183.62.15.118.25546 &amp;gt; 172.17.21.105.22: Flags &lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;S], seq 3657881821, win 65535, options &lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;mss 1460,nop,wscale 2,nop,nop,sackOK], length 0
+19:15:56.657900 IP 183.62.15.118.25546 &amp;gt; 172.17.21.105.22: Flags &lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;S], seq 3657881821, win 65535, options &lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;mss 1460,nop,wscale 2,nop,nop,sackOK], length 0&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;p&gt;数据包数量3个&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-bash&quot; data-lang=&quot;bash&quot;&gt;&lt;span class=&quot;gp&quot;&gt;root@InternetGateway:~# &lt;/span&gt;iptables  -L -n -v -x | grep 10174
+       0        0 ACCEPT     tcp  --  &lt;span class=&quot;k&quot;&gt;*&lt;/span&gt;      &lt;span class=&quot;k&quot;&gt;*&lt;/span&gt;       0.0.0.0/0            172.17.21.105        state RELATED,ESTABLISHED /&lt;span class=&quot;k&quot;&gt;*&lt;/span&gt; 61.146.164.120:10174:10174 &lt;span class=&quot;k&quot;&gt;*&lt;/span&gt;/
+   21435  1209442 ACCEPT     tcp  --  &lt;span class=&quot;k&quot;&gt;*&lt;/span&gt;      &lt;span class=&quot;k&quot;&gt;*&lt;/span&gt;       0.0.0.0/0            172.17.21.105        tcp dpt:22 state NEW /&lt;span class=&quot;k&quot;&gt;*&lt;/span&gt; 61.146.164.120:10174:10174 &lt;span class=&quot;k&quot;&gt;*&lt;/span&gt;/
+&lt;span class=&quot;gp&quot;&gt;root@InternetGateway:~# &lt;/span&gt;iptables  -L -n -v -x | grep 10174
+       0        0 ACCEPT     tcp  --  &lt;span class=&quot;k&quot;&gt;*&lt;/span&gt;      &lt;span class=&quot;k&quot;&gt;*&lt;/span&gt;       0.0.0.0/0            172.17.21.105        state RELATED,ESTABLISHED /&lt;span class=&quot;k&quot;&gt;*&lt;/span&gt; 61.146.164.120:10174:10174 &lt;span class=&quot;k&quot;&gt;*&lt;/span&gt;/
+   21438  1209598 ACCEPT     tcp  --  &lt;span class=&quot;k&quot;&gt;*&lt;/span&gt;      &lt;span class=&quot;k&quot;&gt;*&lt;/span&gt;       0.0.0.0/0            172.17.21.105        tcp dpt:22 state NEW /&lt;span class=&quot;k&quot;&gt;*&lt;/span&gt; 61.146.164.120:10174:10174 &lt;span class=&quot;k&quot;&gt;*&lt;/span&gt;/&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;p&gt;6)mangle表postrouting&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-bash&quot; data-lang=&quot;bash&quot;&gt;&lt;span class=&quot;gp&quot;&gt;root@InternetGateway:~# &lt;/span&gt;iptables  -t mangle -L -n -v -x
+Chain POSTROUTING &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;policy ACCEPT 2829042 packets, 2712854044 bytes&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
+    pkts      bytes target     prot opt &lt;span class=&quot;k&quot;&gt;in     &lt;/span&gt;out     &lt;span class=&quot;nb&quot;&gt;source               &lt;/span&gt;destination         
+       1       66 CHECKSUM   udp  --  &lt;span class=&quot;k&quot;&gt;*&lt;/span&gt;      &lt;span class=&quot;k&quot;&gt;*&lt;/span&gt;       0.0.0.0/0            0.0.0.0/0            udp dpt:68 CHECKSUM fill&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;p&gt;默认规则放行&lt;/p&gt;
+
+&lt;p&gt;数据包依然是：&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-bash&quot; data-lang=&quot;bash&quot;&gt;IP 183.62.15.118.12604 &amp;gt; 172.17.21.105.22&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;p&gt;7)nat表postrouting&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-bash&quot; data-lang=&quot;bash&quot;&gt;&lt;span class=&quot;gp&quot;&gt;root@InternetGateway:~# &lt;/span&gt;iptables  -t nat -L -n -v -x
+Chain POSTROUTING &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;policy ACCEPT 66701 packets, 4451479 bytes&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;p&gt;走默认规则，accept&lt;/p&gt;
+
+&lt;p&gt;数据包依然是：&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-bash&quot; data-lang=&quot;bash&quot;&gt;IP 183.62.15.118.12604 &amp;gt; 172.17.21.105.22&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;p&gt;到这里为止：数据包已经走完了在1级VR的最后一段旅途，再也回不来了。
+下面进行2级VR的操作。&lt;/p&gt;
+
+&lt;h2 id=&quot;vr-1&quot;&gt;2.4.2分析数据包在2级VR中的走向&lt;/h2&gt;
+&lt;p&gt;ip地址&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-bash&quot; data-lang=&quot;bash&quot;&gt;eth1:10.1.1.1/24
+eth2：172.17.21.105/24&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;p&gt;路由表&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-bash&quot; data-lang=&quot;bash&quot;&gt;&lt;span class=&quot;gp&quot;&gt;root@r-588-VM:~# &lt;/span&gt;route -n
+Kernel IP routing table
+Destination     Gateway         Genmask         Flags Metric Ref    Use Iface
+0.0.0.0         172.17.21.1     0.0.0.0         UG    0      0        0 eth2
+10.1.1.0        0.0.0.0         255.255.255.0   U     0      0        0 eth0
+169.254.0.0     0.0.0.0         255.255.0.0     U     0      0        0 eth1
+172.17.21.0     0.0.0.0         255.255.255.0   U     0      0        0 eth2&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;p&gt;抓包测试
+数据包到二级VR之后，就没有回包，问题可能就出在这里。&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-bash&quot; data-lang=&quot;bash&quot;&gt;&lt;span class=&quot;gp&quot;&gt;root@r-588-VM:~# &lt;/span&gt;tcpdump -i eth2 -nn  host 183.62.15.118 
+tcpdump: verbose output suppressed, use -v or -vv &lt;span class=&quot;k&quot;&gt;for &lt;/span&gt;full protocol decode
+listening on eth2, link-type EN10MB &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;Ethernet&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;, capture size 65535 bytes
+11:28:43.771665 IP 183.62.15.118.25706 &amp;gt; 172.17.21.105.22: Flags &lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;S], seq 1049927226, win 65535, options &lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;mss 1460,nop,wscale 2,nop,nop,sackOK], length 0
+11:28:46.730812 IP 183.62.15.118.25706 &amp;gt; 172.17.21.105.22: Flags &lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;S], seq 1049927226, win 65535, options &lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;mss 1460,nop,wscale 2,nop,nop,sackOK], length 0
+11:28:52.752525 IP 183.62.15.118.25706 &amp;gt; 172.17.21.105.22: Flags &lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;S], seq 1049927226, win 65535, options &lt;span class=&quot;o&quot;&gt;[&lt;/span&gt;mss 1460,nop,wscale 2,nop,nop,sackOK], length 0&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;p&gt;1)mangle表 prerouting
+分析：
+1. 数据包进来，匹配到了prerouting链上面的自定义链
+2. 注意是NEW包，自定义链的第一条规则不会匹配
+3. 最终匹配到了DROP的规则，数据包在这里丢弃，数据包在这里就丢弃了&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-bash&quot; data-lang=&quot;bash&quot;&gt;&lt;span class=&quot;gp&quot;&gt;root@r-588-VM:~# &lt;/span&gt;iptables -t mangle -L -n -v -x
+Chain PREROUTING &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;policy ACCEPT 5161795 packets, 2771007577 bytes&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
+pkts      bytes target     prot opt &lt;span class=&quot;k&quot;&gt;in     &lt;/span&gt;out     &lt;span class=&quot;nb&quot;&gt;source               &lt;/span&gt;destination
+68331 27713097 FIREWALL_172.17.21.105  all  --  &lt;span class=&quot;k&quot;&gt;*&lt;/span&gt;      &lt;span class=&quot;k&quot;&gt;*&lt;/span&gt;       0.0.0.0/0            172.17.21.105
+
+
+Chain FIREWALL_172.17.21.105 &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;1 references&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
+    pkts      bytes target     prot opt &lt;span class=&quot;k&quot;&gt;in     &lt;/span&gt;out     &lt;span class=&quot;nb&quot;&gt;source               &lt;/span&gt;destination         
+   34652 25511785 ACCEPT     all  --  &lt;span class=&quot;k&quot;&gt;*&lt;/span&gt;      &lt;span class=&quot;k&quot;&gt;*&lt;/span&gt;       0.0.0.0/0            0.0.0.0/0            state RELATED,ESTABLISHED
+    6766   285688 RETURN     tcp  --  &lt;span class=&quot;k&quot;&gt;*&lt;/span&gt;      &lt;span class=&quot;k&quot;&gt;*&lt;/span&gt;       0.0.0.0/0            0.0.0.0/0            tcp dpts:300:65535
+    2364   524301 RETURN     udp  --  &lt;span class=&quot;k&quot;&gt;*&lt;/span&gt;      &lt;span class=&quot;k&quot;&gt;*&lt;/span&gt;       0.0.0.0/0            0.0.0.0/0            udp dpts:300:65535
+     792    38817 RETURN     icmp --  &lt;span class=&quot;k&quot;&gt;*&lt;/span&gt;      &lt;span class=&quot;k&quot;&gt;*&lt;/span&gt;       0.0.0.0/0            0.0.0.0/0            icmptype 8 code 0
+   23757  1352506 DROP       all  --  &lt;span class=&quot;k&quot;&gt;*&lt;/span&gt;      &lt;span class=&quot;k&quot;&gt;*&lt;/span&gt;       0.0.0.0/0            0.0.0.0/0  &lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;p&gt;既然发现了问题，自然要尝试去解决问题了。下面继续分析&lt;/p&gt;
+
+&lt;h2 id=&quot;ssh-61146164120-10174--101169-22&quot;&gt;2.4.3分析ssh 61.146.164.120 10174 如何转发到内部 10.1.1.69 22&lt;/h2&gt;
+&lt;p&gt;这里要继续2.4.2分析数据包在2级VR的走向的章节。
+1)nat表 prerouting
+分析：
+1. 数据包是从eth2口进来的，自然匹配到eth2
+2. 而且这里的DNAT是全映射(由于在1级VR做的是22端口DNAT，其实也就相当端口DNAT)
+3. c)可惜啊，并没有啥用，因为前面mangle表的prerouting链规则已经把你抛弃了&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-bash&quot; data-lang=&quot;bash&quot;&gt;&lt;span class=&quot;gp&quot;&gt;root@r-588-VM:~# &lt;/span&gt;iptables -t nat -L -n -v -x 
+Chain PREROUTING &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;policy ACCEPT 391687 packets, 16175211 bytes&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
+pkts      bytes target     prot opt &lt;span class=&quot;k&quot;&gt;in     &lt;/span&gt;out     &lt;span class=&quot;nb&quot;&gt;source               &lt;/span&gt;destination
+  11008   935157 DNAT       all  --  eth2   &lt;span class=&quot;k&quot;&gt;*&lt;/span&gt;       0.0.0.0/0            172.17.21.105        to:10.1.1.69
+       0        0 DNAT       all  --  eth0   &lt;span class=&quot;k&quot;&gt;*&lt;/span&gt;       0.0.0.0/0            172.17.21.105        to:10.1.1.69&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;p&gt;上面分析的其实是虚拟机默认分配的管理ip:端口，下面分析下判定公网ip的主要路由规则&lt;/p&gt;
+
+&lt;h2 id=&quot;ipiptables&quot;&gt;2.5分析判定绑定公网IP的主要iptables规则&lt;/h2&gt;
+&lt;p&gt;注意:这里不会那么详细，但是会列出所有需要的规则信息
+## 2.5.1分析一级VR的主要规则
+1)nat表的prerouting链&lt;/p&gt;
+
+&lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-bash&quot; data-lang=&quot;bash&quot;&gt;&lt;span class=&quot;gp&quot;&gt;root@InternetGateway:~# &lt;/span&gt;iptables -t nat -L -n -x -v
+Chain PREROUTING &lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;policy ACCEPT 182136 packets, 11548087 bytes&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
+    pkts      bytes target     prot opt &lt;span class=&quot;k&quot;&gt;in     &lt;/span&gt;out     &lt;span class=&quot;nb&quot;&gt;source               &lt;/span&gt;destination
+   69847  4341308 DNAT       all  --  eth2   &lt;span class=&quot;k&quot;&gt;*&lt;/span&gt;       0.0.0.0/0            61.146.164.82        to:172.17.21.105
+       0        0 DNAT       all  --  eth0   &lt;span class=&quot;k&quot;&gt;*&lt;/span&gt;       0.0.0.0/0            61.146.164.82        to:172.17.21.105&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
+
+&lt;p&gt;问题出现在这了&lt;/p&gt;
+
+&lt;p&gt;上面的管理ssh连接的转换时DNAT:port&lt;/p&gt;
+
+&lt;table&gt;
+  &lt;tbody&gt;
+    &lt;tr&gt;
+      &lt;td&gt;源地址；端口&lt;/td&gt;
+      &lt;td&gt;目标地址：端口&lt;/td&gt;
+      &lt;td&gt;源地址：端口&lt;/td&gt;
+      &lt;td&gt;转换后目标地址：端口&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td&gt;0.0.0.0/0&lt;/td&gt;
+      &lt;td&gt;61.146.164.120:10174&lt;/td&gt;
+      &lt;td&gt;0.0.0.0/0&lt;/td&gt;
+      &lt;td&gt;172.17.21.105:22&lt;/td&gt;
+    &lt;/tr&gt;
+  &lt;/tbody&gt;
+&lt;/table&gt;
+
+&lt;p&gt;绑定公网IP的做了DNAT的full nat
+源地址；	目标地址	源地址	转换后目标地址
+  0.0.0.0/0	61.146.164.82	0.0.0.0/0	172.17.21.105
+由于两种iptables规则都转换到了同个系统IP172.17.21.105
+这就造成了在二级VR的mangle链把目标是172.17.21.105的数据包不是tcp300-65535端口的全部drop掉。&lt;/p&gt;
+
+&lt;h2 id=&quot;section-2&quot;&gt;6分析如何解决上面的故障&lt;/h2&gt;
+
+&lt;p&gt;既然发现了这个问题，明显是一个大的bug问题，研发同志居然没有发现出来……&lt;/p&gt;
+
+&lt;p&gt;从一个运维的角度来思考如何解决这个问题，但是由于涉及到代码，具体怎么解决，还是要和研发沟通这个问题。&lt;/p&gt;
+
+&lt;p&gt;毕竟云架构比较复杂，牵一发动全身，建议使用最小改动的原则。&lt;/p&gt;
+
+&lt;p&gt;建议的解决方案1：&lt;/p&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;假如虚拟机绑定了公网IP，则管理端口的nat转换移动到mangle表的prerouting链上处理(在公网IP过滤规则之前处理)。&lt;/li&gt;
+  &lt;li&gt;假如虚拟机没有绑定公网IP，则还是按照目前的方案处理。&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;这部分对代码的改动是比较少的，研发只需要在用户要绑定公网IP的时候做一个处理，把在nat表上管理端口的nat转换移动到mangle表上处理即可。&lt;/p&gt;
+
+&lt;p&gt;建议解决方案2：最合理的方式&lt;/p&gt;
+
+&lt;p&gt;对绑定的公网IP的虚拟机，如61.146.164.82这个IP，在一级VR上面做iptables过滤规则，根据上面客户的需求：把访问目标地址是61.146.164.82  tcp 300-65535的端口给过滤掉；二级VR的mangle表prerouting链的过滤规则删除掉&lt;/p&gt;
+
+&lt;p&gt;建议解决方案3：
+1. 管理用的ssh端口的映射分配 系统ip172.17.21.105
+2. 绑定公网IP的分配一个新的系统ip 如 172.17.21.212&lt;/p&gt;
+
+&lt;h2 id=&quot;section-3&quot;&gt;参考&lt;/h2&gt;
+&lt;p&gt;&lt;a href=&quot;http://cn.linux.vbird.org/linux_server/0250simple_firewall.php&quot;&gt;鸟哥的资料&lt;/a&gt;&lt;/p&gt;</content><summary></summary><media:thumbnail xmlns:media="http://search.yahoo.com/mrss/" url="{&quot;teaser&quot;=&gt;&quot;/teaser/iptables.jpg&quot;}" /></entry></feed>
