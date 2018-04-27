@@ -1,0 +1,11 @@
+[33mConfiguration file: none[0m
+            Source: /data/github/Qason.github.io/images
+       Destination: /data/github/Qason.github.io/images/_site
+ Incremental build: disabled. Enable with --incremental
+      Generating... 
+                    done in 0.01 seconds.
+ Auto-regeneration: enabled for '/data/github/Qason.github.io/images'
+[33mConfiguration file: none[0m
+    Server address: http://127.0.0.1:4000/
+  Server running... press ctrl-c to stop.
+[2018-04-24 20:38:14] ERROR `/favicon.ico' not found.

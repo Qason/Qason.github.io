@@ -44,3 +44,226 @@ Configuration file: /data/qason_blog/skinny-bones-jekyll/_config.yml
        Destination: /data/qason_blog/skinny-bones-jekyll/_site
  Incremental build: disabled. Enable with --incremental
       Generating... 
+                    done in 0.868 seconds.
+ Auto-regeneration: enabled for '/data/qason_blog/skinny-bones-jekyll'
+Configuration file: /data/qason_blog/skinny-bones-jekyll/_config.yml
+    Server address: http://127.0.0.1:4000/
+  Server running... press ctrl-c to stop.
+Configuration file: /data/github/Qason.github.io/_config.yml
+            Source: /data/github/Qason.github.io
+       Destination: /data/github/Qason.github.io/_site
+ Incremental build: disabled. Enable with --incremental
+      Generating... 
+                    done in 2.85 seconds.
+ Auto-regeneration: enabled for '/data/github/Qason.github.io'
+Configuration file: /data/github/Qason.github.io/_config.yml
+    Server address: http://127.0.0.1:4000/
+  Server running... press ctrl-c to stop.
+Configuration file: /data/github/Qason.github.io/_config.yml
+            Source: /data/github/Qason.github.io
+       Destination: /data/github/Qason.github.io/_site
+ Incremental build: disabled. Enable with --incremental
+      Generating... 
+                    done in 0.744 seconds.
+ Auto-regeneration: enabled for '/data/github/Qason.github.io'
+Configuration file: /data/github/Qason.github.io/_config.yml
+    Server address: http://127.0.0.1:4000/
+  Server running... press ctrl-c to stop.
+      Regenerating: 1 file(s) changed at 2018-04-24 20:31:09 ...done in 0.708192646 seconds.
+Configuration file: /data/github/Qason.github.io/_config.yml
+            Source: /data/github/Qason.github.io
+       Destination: /data/github/Qason.github.io/_site
+ Incremental build: disabled. Enable with --incremental
+      Generating... 
+                    done in 0.72 seconds.
+ Auto-regeneration: enabled for '/data/github/Qason.github.io'
+Configuration file: /data/github/Qason.github.io/_config.yml
+    Server address: http://127.0.0.1:4000/
+  Server running... press ctrl-c to stop.
+      Regenerating: 1 file(s) changed at 2018-04-24 20:35:41 ...done in 0.719380049 seconds.
+      Regenerating: 1 file(s) changed at 2018-04-24 20:36:12 ...done in 0.750032193 seconds.
+Configuration file: /data/github/Qason.github.io/_config.yml
+            Source: /data/github/Qason.github.io
+       Destination: /data/github/Qason.github.io/_site
+ Incremental build: disabled. Enable with --incremental
+      Generating... 
+                    done in 0.725 seconds.
+ Auto-regeneration: enabled for '/data/github/Qason.github.io'
+Configuration file: /data/github/Qason.github.io/_config.yml
+    Server address: http://127.0.0.1:4000/
+  Server running... press ctrl-c to stop.
+      Regenerating: 1 file(s) changed at 2018-04-24 20:38:05 ...done in 0.76125428 seconds.
+Configuration file: /data/github/Qason.github.io/_config.yml
+            Source: /data/github/Qason.github.io
+       Destination: /data/github/Qason.github.io/_site
+ Incremental build: disabled. Enable with --incremental
+      Generating... 
+                    done in 0.756 seconds.
+ Auto-regeneration: enabled for '/data/github/Qason.github.io'
+Configuration file: /data/github/Qason.github.io/_config.yml
+    Server address: http://127.0.0.1:4000/
+  Server running... press ctrl-c to stop.
+      Regenerating: 1 file(s) changed at 2018-04-24 20:43:34 ...done in 0.713303096 seconds.
+Configuration file: /data/github/Qason.github.io/_config.yml
+            Source: /data/github/Qason.github.io
+       Destination: /data/github/Qason.github.io/_site
+ Incremental build: disabled. Enable with --incremental
+      Generating... 
+                    done in 0.746 seconds.
+ Auto-regeneration: enabled for '/data/github/Qason.github.io'
+Configuration file: /data/github/Qason.github.io/_config.yml
+    Server address: http://127.0.0.1:4000/
+  Server running... press ctrl-c to stop.
+      Regenerating: 1 file(s) changed at 2018-04-24 20:46:42 ...done in 0.71791429 seconds.
+      Regenerating: 1 file(s) changed at 2018-04-24 20:46:43 ...done in 0.740635397 seconds.
+      Regenerating: 1 file(s) changed at 2018-04-24 20:50:31 ...done in 1.621188339 seconds.
+Configuration file: /data/github/Qason.github.io/_config.yml
+            Source: /data/github/Qason.github.io
+       Destination: /data/github/Qason.github.io/_site
+ Incremental build: disabled. Enable with --incremental
+      Generating... 
+                    done in 0.84 seconds.
+ Auto-regeneration: enabled for '/data/github/Qason.github.io'
+Configuration file: /data/github/Qason.github.io/_config.yml
+    Server address: http://127.0.0.1:4000/
+  Server running... press ctrl-c to stop.
+[2018-04-24 20:51:13] ERROR `/images/teaser/osc.jpg' not found.
+[2018-04-24 20:51:24] ERROR `/images/teaser/osc.jpg' not found.
+[2018-04-24 20:51:50] ERROR `/images/mysql/osc/osc.png' not found.
+      Regenerating: 1 file(s) changed at 2018-04-24 20:55:02 ...done in 0.832358227 seconds.
+[2018-04-24 20:55:07] ERROR `/images/teaser/osc.jpg' not found.
+[2018-04-24 20:55:09] ERROR `/images/jekyll/blog_preview.png' not found.
+[2018-04-24 20:55:10] ERROR `/images/jekyll/blog_preview_with_navi.png' not found.
+[2018-04-24 20:55:43] ERROR `/images/jekyll/blog_preview.png' not found.
+[2018-04-24 20:55:43] ERROR `/images/jekyll/blog_preview_with_navi.png' not found.
+[2018-04-24 20:55:45] ERROR `/images/jekyll/blog_preview.png' not found.
+[2018-04-24 20:55:45] ERROR `/images/jekyll/blog_preview_with_navi.png' not found.
+[2018-04-24 20:55:54] ERROR `/images/jekyll/blog_preview.png' not found.
+[2018-04-24 20:55:54] ERROR `/images/jekyll/blog_preview_with_navi.png' not found.
+[2018-04-24 20:59:33] ERROR `/images/jekyll/blog_preview.png' not found.
+[2018-04-24 20:59:33] ERROR `/images/jekyll/blog_preview_with_navi.png' not found.
+[2018-04-24 20:59:36] ERROR `/images/jekyll/blog_preview.png' not found.
+[2018-04-24 20:59:36] ERROR `/images/jekyll/blog_preview_with_navi.png' not found.
+Configuration file: /data/github/Qason.github.io/_config.yml
+            Source: /data/github/Qason.github.io
+       Destination: /data/github/Qason.github.io/_site
+ Incremental build: disabled. Enable with --incremental
+      Generating... 
+                    done in 0.948 seconds.
+ Auto-regeneration: enabled for '/data/github/Qason.github.io'
+Configuration file: /data/github/Qason.github.io/_config.yml
+    Server address: http://127.0.0.1:4000/
+  Server running... press ctrl-c to stop.
+[2018-04-24 20:59:45] ERROR `/images/jekyll/blog_preview.png' not found.
+[2018-04-24 20:59:45] ERROR `/images/jekyll/blog_preview_with_navi.png' not found.
+[2018-04-24 20:59:47] ERROR `/images/jekyll/blog_preview.png' not found.
+[2018-04-24 20:59:47] ERROR `/images/jekyll/blog_preview_with_navi.png' not found.
+[2018-04-24 20:59:52] ERROR `/images/jekyll/blog_preview.png' not found.
+[2018-04-24 20:59:52] ERROR `/images/jekyll/blog_preview_with_navi.png' not found.
+[2018-04-24 20:59:54] ERROR `/images/teaser/osc.jpg' not found.
+[2018-04-24 20:59:56] ERROR `/images/jekyll/blog_preview.png' not found.
+[2018-04-24 20:59:56] ERROR `/images/jekyll/blog_preview_with_navi.png' not found.
+      Regenerating: 1 file(s) changed at 2018-04-24 21:00:47 ...done in 0.766287894 seconds.
+[2018-04-24 21:00:50] ERROR `/images/jekyll/blog_preview.png' not found.
+[2018-04-24 21:00:50] ERROR `/images/jekyll/blog_preview_with_navi.png' not found.
+[2018-04-24 21:00:53] ERROR `/images/teaser/osc.jpg' not found.
+[2018-04-24 21:00:55] ERROR `/images/jekyll/blog_preview.png' not found.
+[2018-04-24 21:00:55] ERROR `/images/jekyll/blog_preview_with_navi.png' not found.
+[2018-04-24 21:01:07] ERROR `/linux/' not found.
+[2018-04-24 21:01:12] ERROR `/images/jekyll/blog_preview.png' not found.
+[2018-04-24 21:01:12] ERROR `/images/jekyll/blog_preview_with_navi.png' not found.
+[2018-04-24 21:01:15] ERROR `/images/teaser/osc.jpg' not found.
+[2018-04-24 21:01:17] ERROR `/images/jekyll/blog_preview.png' not found.
+[2018-04-24 21:01:17] ERROR `/images/jekyll/blog_preview_with_navi.png' not found.
+Configuration file: /data/github/Qason.github.io/_config.yml
+[31m  Dependency Error: Yikes! It looks like you don't have jekyll-toc or one of its dependencies installed. In order to use Jekyll as currently configured, you'll need to install this gem. The full error message from Ruby is: 'cannot load such file -- jekyll-toc' If you run into trouble, you can find helpful resources at http://jekyllrb.com/help/! [0m
+jekyll 3.1.6 | Error:  jekyll-toc
+Configuration file: /data/github/Qason.github.io/_config.yml
+[31m       Deprecation: The 'plugins' configurationoption has been renamed to 'plugins_dir'. Please update your config file accordingly.[0m
+            Source: /data/github/Qason.github.io
+       Destination: /data/github/Qason.github.io/_site
+ Incremental build: disabled. Enable with --incremental
+      Generating... 
+                    done in 0.894 seconds.
+ Auto-regeneration: enabled for '/data/github/Qason.github.io'
+Configuration file: /data/github/Qason.github.io/_config.yml
+[31m       Deprecation: The 'plugins' configurationoption has been renamed to 'plugins_dir'. Please update your config file accordingly.[0m
+    Server address: http://127.0.0.1:4000/
+  Server running... press ctrl-c to stop.
+jekyll 3.1.6 | Error:  (/data/github/Qason.github.io/_config.yml): did not find expected '-' indicator while parsing a block collection at line 22 column 3
+Configuration file: /data/github/Qason.github.io/_config.yml
+[31m  Dependency Error: Yikes! It looks like you don't have jekyll-toc or one of its dependencies installed. In order to use Jekyll as currently configured, you'll need to install this gem. The full error message from Ruby is: 'cannot load such file -- jekyll-toc' If you run into trouble, you can find helpful resources at http://jekyllrb.com/help/! [0m
+jekyll 3.1.6 | Error:  jekyll-toc
+Configuration file: /data/github/Qason.github.io/_config.yml
+[31m  Dependency Error: Yikes! It looks like you don't have jekyll-toc or one of its dependencies installed. In order to use Jekyll as currently configured, you'll need to install this gem. The full error message from Ruby is: 'cannot load such file -- jekyll-toc' If you run into trouble, you can find helpful resources at http://jekyllrb.com/help/! [0m
+jekyll 3.1.6 | Error:  jekyll-toc
+Configuration file: /data/github/Qason.github.io/_config.yml
+            Source: /data/github/Qason.github.io
+       Destination: /data/github/Qason.github.io/_site
+ Incremental build: disabled. Enable with --incremental
+      Generating... 
+                    done in 0.927 seconds.
+ Auto-regeneration: enabled for '/data/github/Qason.github.io'
+Configuration file: /data/github/Qason.github.io/_config.yml
+    Server address: http://127.0.0.1:4000/
+  Server running... press ctrl-c to stop.
+Configuration file: /data/github/Qason.github.io/_config.yml
+            Source: /data/github/Qason.github.io
+       Destination: /data/github/Qason.github.io/_site
+ Incremental build: disabled. Enable with --incremental
+      Generating... 
+                    done in 0.88 seconds.
+ Auto-regeneration: enabled for '/data/github/Qason.github.io'
+Configuration file: /data/github/Qason.github.io/_config.yml
+    Server address: http://127.0.0.1:4000/
+  Server running... press ctrl-c to stop.
+[2018-04-24 21:31:52] ERROR `/images/teaser/osc.jpg' not found.
+[2018-04-24 21:31:57] ERROR `/images/jekyll/blog_preview.png' not found.
+[2018-04-24 21:31:57] ERROR `/images/jekyll/blog_preview_with_navi.png' not found.
+[2018-04-24 21:32:02] ERROR `/images/jekyll/blog_preview.png' not found.
+[2018-04-24 21:32:02] ERROR `/images/jekyll/blog_preview_with_navi.png' not found.
+[2018-04-24 21:32:08] ERROR `/images/mysql/osc/osc.png' not found.
+      Regenerating: 1 file(s) changed at 2018-04-24 21:33:25 ...done in 0.779271127 seconds.
+[2018-04-24 21:34:56] ERROR `/images/jekyll/blog_preview.png' not found.
+[2018-04-24 21:34:56] ERROR `/images/jekyll/blog_preview_with_navi.png' not found.
+      Regenerating: 1 file(s) changed at 2018-04-24 21:52:18 ...done in 0.852565467 seconds.
+[2018-04-24 21:52:24] ERROR `/images/mysql/osc/osc.png' not found.
+[2018-04-24 21:52:25] ERROR `/images/teaser/osc.jpg' not found.
+[2018-04-24 21:52:27] ERROR `/images/mysql/osc/osc.png' not found.
+Configuration file: /data/github/Qason.github.io/_config.yml
+            Source: /data/github/Qason.github.io
+       Destination: /data/github/Qason.github.io/_site
+ Incremental build: disabled. Enable with --incremental
+      Generating... 
+                    done in 0.94 seconds.
+ Auto-regeneration: enabled for '/data/github/Qason.github.io'
+Configuration file: /data/github/Qason.github.io/_config.yml
+    Server address: http://127.0.0.1:4000/
+  Server running... press ctrl-c to stop.
+[2018-04-24 21:52:38] ERROR `/images/mysql/osc/osc.png' not found.
+[2018-04-24 21:52:41] ERROR `/images/mysql/osc/osc.png' not found.
+[2018-04-24 21:52:45] ERROR `/images/teaser/osc.jpg' not found.
+[2018-04-24 21:52:47] ERROR `/images/mysql/osc/osc.png' not found.
+[2018-04-24 21:53:32] ERROR `/images/teaser/osc.jpg' not found.
+[2018-04-24 21:53:35] ERROR `/images/jekyll/blog_preview.png' not found.
+[2018-04-24 21:53:35] ERROR `/images/jekyll/blog_preview_with_navi.png' not found.
+      Regenerating: 1 file(s) changed at 2018-04-24 22:28:42 ...done in 0.847084538 seconds.
+[2018-04-24 22:28:48] ERROR `/images/jekyll/blog_preview.png' not found.
+[2018-04-24 22:28:48] ERROR `/images/jekyll/blog_preview_with_navi.png' not found.
+[2018-04-24 22:28:50] ERROR `/images/teaser/osc.jpg' not found.
+[2018-04-24 22:28:52] ERROR `/images/mysql/osc/osc.png' not found.
+      Regenerating: 1 file(s) changed at 2018-04-24 22:31:18 ...done in 0.800204487 seconds.
+[2018-04-24 22:31:33] ERROR `/images/mysql/osc/osc.png' not found.
+[2018-04-24 22:31:36] ERROR `/images/teaser/osc.jpg' not found.
+[2018-04-24 22:31:48] ERROR `/images/mysql/osc/osc.png' not found.
+[2018-04-24 22:31:51] ERROR `/images/jekyll/blog_preview.png' not found.
+[2018-04-24 22:31:51] ERROR `/images/jekyll/blog_preview_with_navi.png' not found.
+[2018-04-24 22:31:55] ERROR `/images/mysql/osc/osc.png' not found.
+      Regenerating: 1 file(s) changed at 2018-04-24 22:32:16 ...done in 0.822999813 seconds.
+      Regenerating: 1 file(s) changed at 2018-04-27 19:42:55 ...done in 0.835485925 seconds.
+      Regenerating: 1 file(s) changed at 2018-04-27 19:42:58 ...done in 0.84625617 seconds.
+      Regenerating: 1 file(s) changed at 2018-04-27 19:43:06 ...done in 0.889530073 seconds.
+      Regenerating: 1 file(s) changed at 2018-04-27 19:43:23 ...done in 0.853115027 seconds.
+      Regenerating: 1 file(s) changed at 2018-04-27 19:43:39 ...done in 0.915250418 seconds.
+      Regenerating: 1 file(s) changed at 2018-04-27 19:43:59 ...done in 1.071615613 seconds.
+      Regenerating: 1 file(s) changed at 2018-04-27 19:44:15 

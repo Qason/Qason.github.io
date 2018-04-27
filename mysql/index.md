@@ -1,6 +1,6 @@
 ---
 layout: archive
-title: "Latest Posts"
+title: "Latest Posts Mysql"
 ---
 
 <div class="tiles">
